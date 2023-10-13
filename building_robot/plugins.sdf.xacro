@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<sdf version="1.10" xmlns:xacro="http://ros.org/wiki/xacro">
+    <plugin
+        filename="gz-sim-physics-system"
+        name="gz::sim::systems::Physics">
+    </plugin>
+    <plugin
+        filename="gz-sim-user-commands-system"
+        name="gz::sim::systems::UserCommands">
+    </plugin>
+    <plugin
+        filename="gz-sim-scene-broadcaster-system"
+        name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+    <!-- Moving Forward-->
+    <xacro:macro name="key-trig-pub-plugin" params="key value">
+        <plugin filename="gz-sim-triggered-publisher-system"
+                name="gz::sim::systems::TriggeredPublisher">
+            <input type="gz.msgs.Int32" topic="/keyboard/keypress">
+              <match field="data">${key}</match>
+            </input>
+            <output type="gz.msgs.Twist" topic="/cmd_vel">
+              ${value}
+            </output>
+        </plugin>
+    </xacro:macro>
+    <xacro:key-trig-pub-plugin key="16777234" value="linear: {x: 0.0}, angular: {z: 0.5}" />
+    <xacro:key-trig-pub-plugin key="16777235" value="linear: {x: 0.5}, angular: {z: 0.0}" />
+    <xacro:key-trig-pub-plugin key="16777236" value="linear: {x: 0.0}, angular: {z: -0.5}" />
+    <xacro:key-trig-pub-plugin key="16777237" value="linear: {x: -0.5}, angular: {z: 0.0}" />
+</sdf>

@@ -6,34 +6,8 @@
             <max_step_size>0.001</max_step_size>
             <real_time_factor>1.0</real_time_factor>
         </physics>
-        <plugin
-            filename="gz-sim-physics-system"
-            name="gz::sim::systems::Physics">
-        </plugin>
-        <plugin
-            filename="gz-sim-user-commands-system"
-            name="gz::sim::systems::UserCommands">
-        </plugin>
-        <plugin
-            filename="gz-sim-scene-broadcaster-system"
-            name="gz::sim::systems::SceneBroadcaster">
-        </plugin>
-        <!-- Moving Forward-->
-        <xacro:macro name="key-trig-pub-plugin" params="key value">
-            <plugin filename="gz-sim-triggered-publisher-system"
-                    name="gz::sim::systems::TriggeredPublisher">
-                <input type="gz.msgs.Int32" topic="/keyboard/keypress">
-                  <match field="data">${key}</match>
-                </input>
-                <output type="gz.msgs.Twist" topic="/cmd_vel">
-                  ${value}
-                </output>
-            </plugin>
-        </xacro:macro>
-        <xacro:key-trig-pub-plugin key="16777234" value="linear: {x: 0.0}, angular: {z: 0.5}" />
-        <xacro:key-trig-pub-plugin key="16777235" value="linear: {x: 0.5}, angular: {z: 0.0}" />
-        <xacro:key-trig-pub-plugin key="16777236" value="linear: {x: 0.0}, angular: {z: -0.5}" />
-        <xacro:key-trig-pub-plugin key="16777237" value="linear: {x: -0.5}, angular: {z: 0.0}" />
+
+        <xacro:include filename="plugins.sdf.xacro"/>
 
         <light type="directional" name="sun">
             <cast_shadows>true</cast_shadows>
@@ -49,32 +23,7 @@
             <direction>-0.5 0.1 -0.9</direction>
         </light>
 
-        <model name="ground_plane">
-            <static>true</static>
-            <link name="link">
-                <collision name="collision">
-                <geometry>
-                    <plane>
-                    <normal>0 0 1</normal>
-                    </plane>
-                </geometry>
-                </collision>
-                <visual name="visual">
-                <geometry>
-                    <plane>
-                    <normal>0 0 1</normal>
-                    <size>100 100</size>
-                    </plane>
-                </geometry>
-                <material>
-                    <ambient>0.8 0.8 0.8 1</ambient>
-                    <diffuse>0.8 0.8 0.8 1</diffuse>
-                    <specular>0.8 0.8 0.8 1</specular>
-                </material>
-                </visual>
-            </link>
-        </model>
-
+        <xacro:include filename="ground_plane.sdf.xacro"/>
         <xacro:include filename="vehicle_blue.sdf.xacro"/>
 
     </world>

@@ -2,7 +2,7 @@
 set -e
 
 SOURCE=${PWD##*/}.sdf.xacro
-TARGET=out
+TARGET=.out
 
 xacro -o "$TARGET" "$SOURCE"
 gz sim "$TARGET"
