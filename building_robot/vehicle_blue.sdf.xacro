@@ -1,0 +1,162 @@
+<sdf version="1.10" xmlns:xacro="http://ros.org/wiki/xacro">
+    <model name="vehicle_blue" canonical_link="chassis">
+
+        <xacro:property name="wheel_radius" value="0.4"/>
+        <xacro:property name="wheel_length" value="0.2"/>
+        <xacro:property name="chassis_x" value="2.0"/>
+        <xacro:property name="chassis_y" value="1.0"/>
+        <xacro:property name="chassis_z" value="0.5"/>
+
+        <plugin
+            filename="gz-sim-diff-drive-system"
+            name="gz::sim::systems::DiffDrive">
+            <left_joint>left_wheel_joint</left_joint>
+            <right_joint>right_wheel_joint</right_joint>
+            <wheel_separation>${chassis_y+wheel_length}</wheel_separation>
+            <wheel_radius>${wheel_radius}</wheel_radius>
+            <odom_publish_frequency>1</odom_publish_frequency>
+            <topic>cmd_vel</topic>
+        </plugin>
+
+        <pose relative_to="world">0 0 0 0 0 0</pose>
+        <link name="chassis">
+          <pose relative_to="__model__">0.5 0 ${wheel_radius} 0 0 0</pose>
+            <inertial> <!--inertial properties of the link mass, inertia matix-->
+                <mass>1.14395</mass>
+                <inertia>
+                    <ixx>0.095329</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>0.381317</iyy>
+                    <iyz>0</iyz>
+                    <izz>0.476646</izz>
+                </inertia>
+            </inertial>
+            <visual name='visual'>
+                <geometry>
+                    <box>
+                        <size>${chassis_x} ${chassis_y} ${chassis_z}</size>
+                    </box>
+                </geometry>
+                <!--let's add color to our link-->
+                <material>
+                    <ambient>0.0 0.0 1.0 1</ambient>
+                    <diffuse>0.0 0.0 1.0 1</diffuse>
+                    <specular>0.0 0.0 1.0 1</specular>
+                </material>
+            </visual>
+            <collision name='collision'>
+                <geometry>
+                    <box>
+                        <size>${chassis_x} ${chassis_y} ${chassis_z}</size>
+                    </box>
+                </geometry>
+            </collision>
+        </link>
+
+        <xacro:macro name="wheel" params="prefix x y">
+
+          <link name='${prefix}_wheel'>
+            <pose relative_to="chassis">${x} ${y} 0 -1.5707 0 0</pose>
+              <inertial>
+                  <mass>1</mass>
+                  <inertia>
+                      <ixx>0.043333</ixx>
+                      <ixy>0</ixy>
+                      <ixz>0</ixz>
+                      <iyy>0.043333</iyy>
+                      <iyz>0</iyz>
+                      <izz>0.08</izz>
+                  </inertia>
+              </inertial>
+              <visual name='visual'>
+                <geometry>
+                    <cylinder>
+                        <radius>${wheel_radius}</radius>
+                        <length>${wheel_length}</length>
+                    </cylinder>
+                </geometry>
+                <material>
+                    <ambient>1.0 0.0 0.0 1</ambient>
+                    <diffuse>1.0 0.0 0.0 1</diffuse>
+                    <specular>1.0 0.0 0.0 1</specular>
+                </material>
+              </visual>
+              <collision name='collision'>
+                  <geometry>
+                      <cylinder>
+                          <radius>${wheel_radius}</radius>
+                          <length>${wheel_length}</length>
+                      </cylinder>
+                  </geometry>
+              </collision>
+          </link>
+
+        </xacro:macro> <!-- wheel-->
+
+        <xacro:macro name="wheel_joint" params="prefix">
+            <joint name='${prefix}_wheel_joint' type='revolute'>
+                <pose relative_to='${prefix}_wheel'/>
+                <parent>chassis</parent>
+                <child>${prefix}_wheel</child>
+                <axis>
+                    <xyz expressed_in='__model__'>0 1 0</xyz>
+                    <!-- <limit>
+                        <lower>-1.79769e+308</lower>
+                        <upper>1.79769e+308</upper>
+                    </limit> -->
+                </axis>
+            </joint>
+        </xacro:macro>
+
+        <xacro:wheel prefix="left" x="-0.5" y="${(chassis_y+wheel_length)/2}"/>
+        <xacro:wheel_joint prefix="left"/>
+        <xacro:wheel prefix="right" x="-0.5" y="-${(chassis_y+wheel_length)/2}"/>
+        <xacro:wheel_joint prefix="right"/>
+
+        <frame name="caster_frame" attached_to='chassis'>
+            <pose>0.8 0 -${wheel_radius/2} 0 0 0</pose>
+        </frame>
+
+        <!--caster wheel-->
+        <link name='caster'>
+            <pose relative_to='caster_frame'/>
+            <inertial>
+                <mass>1</mass>
+                <inertia>
+                    <ixx>0.016</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>0.016</iyy>
+                    <iyz>0</iyz>
+                    <izz>0.016</izz>
+                </inertia>
+            </inertial>
+            <visual name='visual'>
+                <geometry>
+                    <sphere>
+                        <radius>${wheel_radius/2}</radius>
+                    </sphere>
+                </geometry>
+                <material>
+                    <ambient>0.0 1 0.0 1</ambient>
+                    <diffuse>0.0 1 0.0 1</diffuse>
+                    <specular>0.0 1 0.0 1</specular>
+                </material>
+            </visual>
+            <collision name='collision'>
+                <geometry>
+                    <sphere>
+                        <radius>${wheel_radius/2}</radius>
+                    </sphere>
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name='caster_wheel' type='ball'>
+            <parent>chassis</parent>
+            <child>caster</child>
+        </joint>
+
+    </model>
+</sdf>
