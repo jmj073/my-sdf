@@ -1,7 +1,0 @@
-<?xml version="1.0" ?>
-<sdf version="1.10" xmlns:xacro="http://ros.org/wiki/xacro">
-    <world name="world_demo">
-    ...
-    ...
-    </world>
-</sdf>
