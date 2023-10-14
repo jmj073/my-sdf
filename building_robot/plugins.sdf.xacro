@@ -12,20 +12,46 @@
         filename="gz-sim-scene-broadcaster-system"
         name="gz::sim::systems::SceneBroadcaster">
     </plugin>
-    <!-- Moving Forward-->
-    <xacro:macro name="key-trig-pub-plugin" params="key value">
+
+    <!-- Moving with key -->
+    <xacro:macro name="trig-pub-vel" params="value *input">
         <plugin filename="gz-sim-triggered-publisher-system"
                 name="gz::sim::systems::TriggeredPublisher">
-            <input type="gz.msgs.Int32" topic="/keyboard/keypress">
-              <match field="data">${key}</match>
-            </input>
+            <xacro:insert_block name="input" />
             <output type="gz.msgs.Twist" topic="/cmd_vel">
               ${value}
             </output>
         </plugin>
     </xacro:macro>
-    <xacro:key-trig-pub-plugin key="16777234" value="linear: {x: 0.0}, angular: {z: 0.5}" />
-    <xacro:key-trig-pub-plugin key="16777235" value="linear: {x: 0.5}, angular: {z: 0.0}" />
-    <xacro:key-trig-pub-plugin key="16777236" value="linear: {x: 0.0}, angular: {z: -0.5}" />
-    <xacro:key-trig-pub-plugin key="16777237" value="linear: {x: -0.5}, angular: {z: 0.0}" />
+    <xacro:macro name="key-trig-pub-vel" params="key value">
+        <xacro:trig-pub-vel value="${value}">
+            <input type="gz.msgs.Int32" topic="/keyboard/keypress">
+              <match field="data">${key}</match>
+            </input>
+        </xacro:trig-pub-vel>
+    </xacro:macro>
+
+    <xacro:trig-pub-vel value="linear: {x: 0.0}, angular: {z: 0.0}">
+        <input type="gz.msgs.Boolean" topic="/wall/touched">
+            <match>data: true</match>
+        </input>
+    </xacro:trig-pub-vel>
+
+    <xacro:key-trig-pub-vel key="16777234" value="linear: {x: 0.0}, angular: {z: 0.5}" />
+    <xacro:key-trig-pub-vel key="16777235" value="linear: {x: 0.5}, angular: {z: 0.0}" />
+    <xacro:key-trig-pub-vel key="16777236" value="linear: {x: 0.0}, angular: {z: -0.5}" />
+    <xacro:key-trig-pub-vel key="16777237" value="linear: {x: -0.5}, angular: {z: 0.0}" />
+
+    <!-- Sensors -->
+    <plugin filename="gz-sim-imu-system"
+            name="gz::sim::systems::Imu">
+    </plugin>
+    <plugin filename="gz-sim-contact-system"
+            name="gz::sim::systems::Contact">
+    </plugin>
+    <plugin
+        filename="gz-sim-sensors-system"
+        name="gz::sim::systems::Sensors">
+        <render_engine>ogre2</render_engine>
+    </plugin>
 </sdf>
